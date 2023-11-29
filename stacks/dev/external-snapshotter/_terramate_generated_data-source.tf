@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/external-snapshotter/external-snapshotter.tm.hcl
 
 data "terraform_remote_state" "eks" {
   backend = "remote"

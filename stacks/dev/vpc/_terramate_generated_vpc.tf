@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/vpc/vpc.tm.hcl
 
 module "vpc" {
   azs = [
@@ -16,9 +15,7 @@ module "vpc" {
     tier                              = "private"
     "kubernetes.io/cluster/ex-eks"    = "shared"
     "kubernetes.io/role/internal-elb" = 1
-
-    # Tags subnets for Karpenter auto-discovery
-    "karpenter.sh/discovery/ex-eks" = "ex-eks"
+    "karpenter.sh/discovery/ex-eks"   = "ex-eks"
   }
   private_subnets = [
     "10.0.1.0/24",

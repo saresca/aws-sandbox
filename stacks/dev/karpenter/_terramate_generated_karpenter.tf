@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/karpenter/karpenter.tm.hcl
 
 provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data)
@@ -19,7 +18,7 @@ locals {
   name = "ex-eks"
 }
 resource "kubernetes_manifest" "karpenter_node_template" {
-  manifest = yamldecode(<<YAML
+  manifest = yamldecode(<<-EOT
       apiVersion: karpenter.k8s.aws/v1alpha1
       kind: AWSNodeTemplate
       metadata:
@@ -32,7 +31,7 @@ resource "kubernetes_manifest" "karpenter_node_template" {
         tags:
           karpenter.sh/discovery/${local.name}: ${local.name}
           CostCenter: "1234"
-    YAML
+EOT
   )
 }
 resource "kubernetes_manifest" "karpenter_provisioner" {
@@ -101,7 +100,7 @@ resource "kubernetes_manifest" "karpenter_example_deployment" {
     kubernetes_manifest.karpenter_node_template,
     kubernetes_manifest.karpenter_provisioner,
   ]
-  manifest = yamldecode(<<YAML
+  manifest = yamldecode(<<-EOT
     apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -124,7 +123,7 @@ resource "kubernetes_manifest" "karpenter_example_deployment" {
               resources:
                 requests:
                   cpu: 1
-    YAML
+EOT
   )
   field_manager {
     force_conflicts = true

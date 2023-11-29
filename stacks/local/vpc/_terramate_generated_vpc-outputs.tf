@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/vpc/outputs.tm.hcl
 
 output "vpc_id" {
   description = "The ID of the VPC"

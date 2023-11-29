@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/eks/eks.tm.hcl
 
 data "aws_partition" "current" {
 }
@@ -14,10 +13,9 @@ locals {
     env   = "dev"
     stack = "aws-eks-dev"
     team  = "devops"
-    },
-    {
-      GithubRepo = "terraform-aws-eks"
-      GithubOrg  = "terraform-aws-modules"
+    }, {
+    GithubRepo = "terraform-aws-eks"
+    GithubOrg  = "terraform-aws-modules"
   })
 }
 module "eks" {
@@ -76,30 +74,24 @@ module "eks" {
     iam_role_attach_cni_policy = true
   }
   eks_managed_node_groups = {
-
-    # Spot Instance Managed Node Group managed by Karpenter
     spot = {
-      name            = "spot-eks-mng"
-      use_name_prefix = true
-
-      subnet_ids = data.terraform_remote_state.vpc.outputs.private_subnets
-
-      min_size     = 2
-      max_size     = 5
-      desired_size = 2
-
+      name                       = "spot-eks-mng"
+      use_name_prefix            = true
+      subnet_ids                 = data.terraform_remote_state.vpc.outputs.private_subnets
+      min_size                   = 2
+      max_size                   = 5
+      desired_size               = 2
       ami_id                     = data.aws_ami.eks_default.image_id
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = "--container-runtime containerd --kubelet-extra-args '--max-pods=20'"
-
-      pre_bootstrap_user_data = <<-EOT
-          export CONTAINER_RUNTIME="containerd"
-          export USE_MAX_PODS=false
-          EOT
+      pre_bootstrap_user_data    = <<-EOT
+export CONTAINER_RUNTIME="containerd"
+export USE_MAX_PODS=false
+EOT
 
       post_bootstrap_user_data = <<-EOT
-          echo "you are free little kubelet!"
-          EOT
+echo "you are free little kubelet!"
+EOT
 
       capacity_type        = "SPOT"
       force_update_version = true
@@ -110,29 +102,16 @@ module "eks" {
         GithubRepo = "terraform-aws-eks"
         GithubOrg  = "terraform-aws-modules"
       }
-
-      # taints = [
-      #   {
-      #     key   = "capacity_type"
-      #     value = "SPOT"
-
-      #     effect = "NO_SCHEDULE"
-      #   }
-      # ]
-
       update_config = {
-        max_unavailable_percentage = 50 # or set `max_unavailable`
+        max_unavailable_percentage = 50
       }
-
-      description = "EKS managed node group example launch template"
-
+      description   = "EKS managed node group example launch template"
       ebs_optimized = true
       vpc_security_group_ids = [
         aws_security_group.additional.id,
       ]
       disable_api_termination = false
       enable_monitoring       = true
-
       block_device_mappings = {
         xvda = {
           device_name = "/dev/xvda"
@@ -147,14 +126,12 @@ module "eks" {
           }
         }
       }
-
       metadata_options = {
         http_endpoint               = "enabled"
         http_tokens                 = "required"
         http_put_response_hop_limit = 2
         instance_metadata_tags      = "disabled"
       }
-
       create_iam_role          = true
       iam_role_use_name_prefix = false
       iam_role_name            = "eks-managed-node-group-spot-example"
@@ -191,10 +168,9 @@ module "eks" {
           from_port                     = 53
           to_port                       = 53
           type                          = "egress"
-          source_cluster_security_group = true # bit of reflection lookup
+          source_cluster_security_group = true
         }
       }
-
       tags = {
         ExtraTag                               = "EKS managed node group spot example"
         "karpenter.sh/discovery/${local.name}" = local.name
@@ -349,9 +325,7 @@ data "aws_iam_policy_document" "ebs" {
     principals {
       identifiers = [
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
-        # required for the ASG to manage encrypted volumes for nodes
         module.eks.cluster_iam_role_arn,
-        # required for the cluster / persistentvolume-controller to create encrypted PVCs
       ]
       type = "AWS"
     }
@@ -367,9 +341,7 @@ data "aws_iam_policy_document" "ebs" {
     principals {
       identifiers = [
         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
-        # required for the ASG to manage encrypted volumes for nodes
         module.eks.cluster_iam_role_arn,
-        # required for the cluster / persistentvolume-controller to create encrypted PVCs
       ]
       type = "AWS"
     }
@@ -413,25 +385,17 @@ data "aws_ami" "eks_default" {
 }
 locals {
   cluster_autoscaler_asg_tags = merge(local.cluster_autoscaler_label_tags, local.cluster_autoscaler_taint_tags)
-  cluster_autoscaler_label_tags = merge([
-    for name, group in module.eks.eks_managed_node_groups : {
-      for label_name, label_value in coalesce(group.node_group_labels, {}) : "${name}|label|${label_name}" => {
-        autoscaling_group = group.node_group_autoscaling_group_names[0],
-        key               = "k8s.io/cluster-autoscaler/node-template/label/${label_name}",
-        value             = label_value,
-      }
-    }
-  ]...)
-  cluster_autoscaler_taint_tags = merge([
-    for name, group in module.eks.eks_managed_node_groups : {
-      for taint in coalesce(group.node_group_taints, [
-        ]) : "${name}|taint|${taint.key}" => {
-        autoscaling_group = group.node_group_autoscaling_group_names[0],
-        key               = "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}"
-        value             = "${taint.value}:${local.taint_effects[taint.effect]}"
-      }
-    }
-  ]...)
+  cluster_autoscaler_label_tags = merge([for name, group in module.eks.eks_managed_node_groups : { for label_name, label_value in coalesce(group.node_group_labels, {}) : "${name}|label|${label_name}" => {
+    autoscaling_group = group.node_group_autoscaling_group_names[0]
+    key               = "k8s.io/cluster-autoscaler/node-template/label/${label_name}"
+    value             = label_value
+  } }]...)
+  cluster_autoscaler_taint_tags = merge([for name, group in module.eks.eks_managed_node_groups : { for taint in coalesce(group.node_group_taints, [
+    ]) : "${name}|taint|${taint.key}" => {
+    autoscaling_group = group.node_group_autoscaling_group_names[0]
+    key               = "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}"
+    value             = "${taint.value}:${local.taint_effects[taint.effect]}"
+  } }]...)
   taint_effects = {
     NO_SCHEDULE        = "NoSchedule"
     NO_EXECUTE         = "NoExecute"

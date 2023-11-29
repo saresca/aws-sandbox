@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/kubecost/kubecost.tm.hcl
 
 provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data)
@@ -41,28 +40,28 @@ resource "helm_release" "kubecost" {
   namespace        = "kubecost"
   repository       = "https://kubecost.github.io/cost-analyzer/"
   values = tolist([
-    <<-YAML
-        prometheus:
-          server:
-            global:
-              external_labels:
-                cluster_id: ${data.terraform_remote_state.eks.outputs.cluster_id}
-          nodeExporter:
-            enabled: false
-        ingress:
-          enabled: true
-          annotations:
-            kubernetes.io/ingress.class: alb
-            alb.ingress.kubernetes.io/target-type: ip
-            alb.ingress.kubernetes.io/scheme: internet-facing
-            alb.ingress.kubernetes.io/backend-protocol: HTTP
-            alb.ingress.kubernetes.io/healthcheck-path: /ui
-            alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
-          paths: ["/*"]
-          pathType: ImplementationSpecific
-          hosts:
-            - cost-analyzer.local
-        YAML
+    <<-EOT
+prometheus:
+  server:
+    global:
+      external_labels:
+        cluster_id: ${data.terraform_remote_state.eks.outputs.cluster_id}
+  nodeExporter:
+    enabled: false
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/healthcheck-path: /ui
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+  paths: ["/*"]
+  pathType: ImplementationSpecific
+  hosts:
+    - cost-analyzer.local
+EOT
     ,
   ])
   version = "1.97.0"

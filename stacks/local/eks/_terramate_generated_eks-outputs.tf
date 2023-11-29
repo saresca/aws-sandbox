@@ -1,5 +1,4 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
-// TERRAMATE: originated from generate_hcl block on /modules/eks/outputs.tm.hcl
 
 output "cluster_arn" {
   description = "The Amazon Resource Name (ARN) of the cluster"
