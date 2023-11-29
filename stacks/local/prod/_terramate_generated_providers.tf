@@ -1,7 +1,7 @@
 // TERRAMATE: GENERATED AUTOMATICALLY DO NOT EDIT
 
 provider "aws" {
-  region = "us-west-2"
+  region = "ap-southeast-1"
 }
 terraform {
   required_providers {

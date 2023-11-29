@@ -5,7 +5,4 @@ globals {
 
   terraform_aws_provider_region      = global.region
   terraform_aws_provider_version     = "~> 4.34"
-
-  
-  isLocal = true
 }

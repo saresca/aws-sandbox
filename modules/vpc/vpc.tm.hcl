@@ -4,7 +4,7 @@ generate_hcl "_terramate_generated_vpc.tf" {
 
     module "vpc" {
       source  = "terraform-aws-modules/vpc/aws"
-      version = "3.16.0"
+      version = "5.2.0"
 
       name       = global.name
       create_vpc = true
@@ -15,26 +15,11 @@ generate_hcl "_terramate_generated_vpc.tf" {
       enable_ipv6 = false
 
       private_subnets = global.private_subnets
-      private_subnet_tags = {
-        tier                                               = "private"
-        "kubernetes.io/cluster/${global.eks_cluster_name}" = "shared"
-        "kubernetes.io/role/internal-elb"                  = 1
-
-        # Tags subnets for Karpenter auto-discovery
-        "karpenter.sh/discovery/${global.eks_cluster_name}" = global.eks_cluster_name
-      }
 
       public_subnets = global.public_subnets
-      public_subnet_tags = {
-        tier                                               = "public"
-        "kubernetes.io/cluster/${global.eks_cluster_name}" = "shared"
-        "kubernetes.io/role/elb"                           = 1
-      }
-
-      enable_nat_gateway   = true
+      
+      enable_nat_gateway   = false
       enable_dns_hostnames = true
-
-      tags = global.tags
     }
   }
 }
