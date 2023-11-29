@@ -11,18 +11,6 @@ generate_hcl "_terramate_generated_providers.tf" {
           source  = "hashicorp/aws"
           version = global.terraform_aws_provider_version
         }
-        kubernetes = {
-          source  = "hashicorp/kubernetes"
-          version = global.terraform_k8s_provider_version
-        }
-        helm = {
-          source  = "hashicorp/helm"
-          version = global.terraform_helm_provider_version
-        }
-        kubectl = {
-          source  = "gavinbunney/kubectl"
-          version = global.terraform_kubectl_provider_version
-        }
       }
     }
 
